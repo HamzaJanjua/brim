@@ -1,0 +1,135 @@
+/* Page background */
+body {
+  margin: 0;
+  height: 100vh;
+  background-color: #ffd8b0;
+  background-image: url("../public/assets/images/bg_img.png");
+  background-repeat: no-repeat;
+  background-position: left bottom; /* 👈 anchors image in bottom-left */
+  background-size: 900px auto; /* 👈 adjust size as needed */
+  font-family: "Poppins", sans-serif;
+}
+
+/* Center the glass login box */
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding: 20px;
+}
+
+
+/* Center content */
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* 🧊 Glassmorphic Login Box */
+.login-container {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  max-width: 1200px;
+  width: 100%;
+  transition: all 0.3s ease-in-out;
+  padding: 90px;
+}
+
+/* Optional subtle glow on hover */
+.login-container:hover {
+  box-shadow: 0 12px 40px rgba(228, 90, 27, 0.35);
+  transform: translateY(-2px);
+}
+
+/* Left form section */
+.form-section {
+  flex: 1;
+  padding: 3rem;
+  background: rgba(255, 255, 255, 0.25); /* semi-transparent white layer */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #000;
+  transition: all 0.3s ease-in-out;
+  max-width: 450px;
+}
+/* Right image section */
+.image-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+}
+
+.login-image {
+  max-height: 450px;
+  object-fit: contain;
+}
+
+
+.btn-orange {
+  background-color: #e45a1b;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 0;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(228, 90, 27, 0.25);
+}
+
+.btn-orange:hover {
+  background-color: #cf4e14; 
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(228, 90, 27, 0.35);
+  transform: translateY(-2px);
+}
+
+.btn-orange:active {
+  transform: scale(0.97);
+  box-shadow: 0 3px 10px rgba(228, 90, 27, 0.25);
+}
+
+.logo-text {
+  color: #e45a1b;        
+  font-weight: 100;        
+  font-size: 1rem;        
+  letter-spacing: 0.5px;   
+  margin-bottom: 0.5rem;
+}
+
+.text-orange {
+  color: #e45a1b;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.text-orange:hover {
+  color: #cf4e14; /* Slightly darker on hover */
+  text-decoration: underline;
+}
+
+
+@media (max-width: 768px) {
+  .form-section {
+    padding: 2rem;
+  }
+}
