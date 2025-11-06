@@ -1,12 +1,18 @@
 import express from "express";
+// import dotenv from 'dotenv';
+// dotenv.config();
+import 'dotenv/config'
 import cors from "cors";
 import db from "./config/database.js";
 import productRoute from "./routes/productRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 
+
 const app = express();
 
+
+const PORT = process.env.PORT;
 // Allowing React frontend (localhost:3000) to access this backend
 // app.use(
 //   cors({
@@ -15,6 +21,7 @@ const app = express();
 //     credentials: true,
 //   })
 // );
+
 
 app.use(
   cors({
@@ -44,6 +51,6 @@ try {
 }
 
 // Start server
-app.listen(3307, () => {
-  console.log("🚀 Server is running on dev environment on port 3307");
+app.listen(PORT, () => {
+  console.log("🚀 Server is running on dev environment on port (3307 previous) " + PORT);
 });

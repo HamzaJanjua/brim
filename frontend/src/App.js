@@ -10,10 +10,11 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AuthRoute from "./components/AuthRoute";
 import CartPage from "./CartPage"; // 🛒 Cart Page
 import { CartProvider } from "./context/CartContext"; // 🧩 Cart Context
+import ProductPage from "./ProductPage"; // 🆕 Product Details Page
 
 function App() {
   return (
-    // 🧠 Wrap everything with CartProvider (outside Router)
+    // 🧠 Wrap everything with CartProvider
     <CartProvider>
       <Router>
         <Routes>
@@ -44,6 +45,16 @@ function App() {
             element={
               <ProtectedRoute role="user">
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* 🆕 Product Details */}
+          <Route
+            path="/product/:id"
+            element={
+              <ProtectedRoute role="user">
+                <ProductPage />
               </ProtectedRoute>
             }
           />

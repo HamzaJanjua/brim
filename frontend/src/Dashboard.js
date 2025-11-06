@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import api from "./api";
 import "./Dashboard.css";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "./context/CartContext"; // ✅ Import cart context
+import { useCart } from "./context/CartContext";
 
 export default function Dashboard() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const { addToCart, cart } = useCart(); // ✅ Use Cart context
+  const { addToCart } = useCart();
 
   // Check if user is logged in
   useEffect(() => {
@@ -20,7 +20,6 @@ export default function Dashboard() {
     fetchProducts();
   }, [navigate]);
 
-  // Fetch products
   const fetchProducts = async () => {
     const token = localStorage.getItem("token");
     try {
@@ -42,35 +41,35 @@ export default function Dashboard() {
     navigate("/login");
   };
 
+  // Add to cart functionality (same as before)
+  const handleAddToCart = (product) => {
+    addToCart(product, 1);
+  };
+
+  // Navigate to product details
+  const handleViewDetails = (id) => {
+    navigate(`/product/${id}`);
+  };
+
   return (
     <div className="App">
       <div className="container my-5">
-        {/* 🧭 Top Section: Title + Cart + Logout */}
+        {/* Top Section */}
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h2 className="fw-bold text-orange">Our Menu</h2>
-          <div className="d-flex align-items-center gap-2">
+          <div className="d-flex gap-3">
             <button
-              className="btn btn-danger position-relative"
+              className="btn btn-outline-dark"
               onClick={() => navigate("/cart")}
             >
-              Cart
-              {cart.length > 0 && (
-                <span
-                  className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                  style={{ fontSize: "0.75rem" }}
-                >
-                  {cart.length}
-                </span>
-              )}
+              🛒 View Cart
             </button>
-
             <button className="btn btn-outline-danger" onClick={handleLogout}>
               Logout
             </button>
           </div>
         </div>
 
-        {/* 🛍️ Product List */}
         {loading ? (
           <p className="text-center text-muted">Loading products...</p>
         ) : (
@@ -83,6 +82,7 @@ export default function Dashboard() {
                       src={product.image}
                       className="card-img-top"
                       alt={product.name}
+                      style={{ height: "200px", objectFit: "cover" }}
                     />
                     <div className="card-body text-center">
                       <h5 className="card-title">{product.name}</h5>
@@ -91,13 +91,21 @@ export default function Dashboard() {
                           ? product.description.substring(0, 71) + "..."
                           : "No description available."}
                       </p>
-                      <h6 className="fw-bold">Price: Rs. {product.price}</h6>
-                      <div className="mt-3">
+                      <h6 className="fw-bold mb-3">
+                        Price: Rs. {product.price}
+                      </h6>
+                      <div className="d-flex justify-content-center gap-2">
                         <button
                           className="btn btn-dark"
-                          onClick={() => addToCart(product)} // ✅ Add to cart
+                          onClick={() => handleAddToCart(product)}
                         >
-                          Add to cart
+                          🛒 Add to Cart
+                        </button>
+                        <button
+                          className="btn btn-outline-secondary"
+                          onClick={() => handleViewDetails(product.id)}
+                        >
+                          🔍 View Details
                         </button>
                       </div>
                     </div>
