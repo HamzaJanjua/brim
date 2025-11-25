@@ -1,3 +1,4 @@
+// frontend/src/AddProduct.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "./api";
@@ -9,7 +10,7 @@ export default function AddProduct() {
   const [stock, setStock] = useState("");
   const [description, setDescription] = useState("");
   const [sku, setSku] = useState("");
-  const [image, setImage] = useState("");
+  const [imageFile, setImageFile] = useState(null); // ⚠️ CHANGE: State for the File object
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -25,11 +26,28 @@ export default function AddProduct() {
       return;
     }
 
-    const payload = { name, price, stock, description, sku, image };
+    if (!imageFile) {
+        setMessage("❌ Please select an image file.");
+        setLoading(false);
+        return;
+    }
+    
+    // ⚠️ CHANGE: Use FormData to send the file and other fields
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("description", description);
+    formData.append("price", price);
+    formData.append("stock", stock);
+    formData.append("sku", sku);
+    formData.append("image", imageFile); // 'image' must match Multer field name
 
     try {
-      const res = await api.post("/product", payload, {
-        headers: { Authorization: `Bearer ${token}` },
+      const res = await api.post("/product", formData, {
+        headers: { 
+            // ⚠️ IMPORTANT: Remove default 'Content-Type: application/json' header.
+            // The browser will automatically set the correct 'multipart/form-data' boundary.
+            'Content-Type': undefined 
+        },
       });
 
       if (res.data.status || res.status === 200) {
@@ -40,7 +58,7 @@ export default function AddProduct() {
       }
     } catch (error) {
       console.error("Add product error:", error);
-      setMessage("❌ Server error, try again.");
+      setMessage("❌ Server error, try again. Check console for details.");
     } finally {
       setLoading(false);
     }
@@ -70,7 +88,7 @@ export default function AddProduct() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} encType="multipart/form-data"> {/* Added encType */}
           {/* Name & SKU side by side */}
           <div className="row g-3 mb-3">
             <div className="col-md-6">
@@ -132,16 +150,17 @@ export default function AddProduct() {
             ></textarea>
           </div>
 
-          {/* Image URL */}
+          {/* ⚠️ CHANGE: File Input replaces Image URL field */}
           <div className="mb-4">
-            <label className="form-label fw-semibold">Image URL</label>
+            <label className="form-label fw-semibold">Image File</label>
             <input
-              type="text"
+              type="file"
               className="form-control"
-              value={image}
-              onChange={(e) => setImage(e.target.value)}
-              placeholder="https://example.com/image.jpg"
+              onChange={(e) => setImageFile(e.target.files[0])}
+              accept="image/*"
+              required
             />
+            {imageFile && <p className="mt-2 text-muted small">Selected file: {imageFile.name}</p>}
           </div>
 
           {/* Submit button */}

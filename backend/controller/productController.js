@@ -1,4 +1,5 @@
 import db from '../config/database.js';
+import { BASE_UPLOAD_PATH } from '../middleware/upload.js';
 
 // Get All Active (Non-deleted) Products
 export const getProducts = (req, res) => {
@@ -52,7 +53,21 @@ export const getProductById = (req, res) => {
 
 // Add Product
 export const addProduct = (req, res) => {
-  const { name, description, price, stock, sku, image } = req.body;
+  console.log("📝 Request Body:", req.body);
+  console.log("Tb Request File:", req.file);
+
+  const { name, description, price, stock, sku } = req.body;
+
+  // ✅ VALIDATION: Ensure an image was actually uploaded
+  if (!req.file) {
+    return res.status(400).json({ 
+      status: false, 
+      message: "Image is required (and must be a valid image format)." 
+    });
+  }
+
+  // Construct the path
+  const image = `${BASE_UPLOAD_PATH}/${req.file.filename}`;
 
   const query = `
     INSERT INTO products 
@@ -62,10 +77,10 @@ export const addProduct = (req, res) => {
 
   db.query(query, [name, description, price, stock, sku, image], (err) => {
     if (err) {
-      console.error("DB Error:", err);
+      console.error("❌ Database Insert Error:", err);
       return res.status(500).json({
         status: false,
-        message: "Database Error while adding product",
+        message: "Database Error: " + err.sqlMessage,
       });
     }
 
@@ -79,7 +94,7 @@ export const addProduct = (req, res) => {
 // Edit / Update Product
 export const editProduct = (req, res) => {
   const { id } = req.params;
-  const { name, description, price, stock, sku, image } = req.body;
+  const { name, description, price, stock, sku } = req.body;
 
   const checkQuery = "SELECT * FROM products WHERE id = ? AND deleted_at IS NULL";
 
@@ -99,13 +114,20 @@ export const editProduct = (req, res) => {
       });
     }
 
+    // Check if a new file was uploaded
+    let newImage = req.file ? `${BASE_UPLOAD_PATH}/${req.file.filename}` : null;
+    
+    // If a new image was uploaded, use it. Otherwise, keep the old one.
+    const oldImage = results[0].image;
+    const finalImage = newImage || oldImage;
+
     const updateQuery = `
       UPDATE products 
       SET name = ?, description = ?, price = ?, stock = ?, sku = ?, image = ?, updated_at = NOW() 
       WHERE id = ? AND deleted_at IS NULL
     `;
 
-    db.query(updateQuery, [name, description, price, stock, sku, image, id], (err) => {
+    db.query(updateQuery, [name, description, price, stock, sku, finalImage, id], (err) => {
       if (err) {
         console.error("DB Error:", err);
         return res.status(500).json({
@@ -122,7 +144,7 @@ export const editProduct = (req, res) => {
   });
 };
 
-// Soft Delete Product (set deleted_at timestamp)
+// Soft Delete Product
 export const deleteProduct = (req, res) => {
   const { id } = req.params;
 
@@ -165,14 +187,4 @@ export const deleteProduct = (req, res) => {
       });
     });
   });
-};
-
-
-export const uploadImage = (req, res) => {
-
-  const {productId} = req.body;
-  const filePath = 'upload/products/' + req.file.filename ;
-
-  const query = "UPDATE products SET iamge= ? WHERE id=?" ;
-
 };

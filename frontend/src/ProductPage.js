@@ -1,3 +1,4 @@
+// frontend/src/ProductPage.js
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "./api";
@@ -8,6 +9,9 @@ export default function ProductPage() {
   const [product, setProduct] = useState(null);
   const navigate = useNavigate();
   const { addToCart } = useCart();
+
+  // ✅ Define base URL for your backend
+  const API_URL = "http://localhost:3307";
 
   const fetchProduct = useCallback(async () => {
     const token = localStorage.getItem("token");
@@ -37,6 +41,13 @@ export default function ProductPage() {
     addToCart(product, 1);
   };
 
+  // ✅ Helper to determine correct image source
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return "https://via.placeholder.com/400"; // Fallback placeholder
+    if (imagePath.startsWith("http")) return imagePath; // External URL (old data)
+    return `${API_URL}${imagePath}`; // Local upload (new data)
+  };
+
   return (
     <div className="container d-flex justify-content-center align-items-center vh-100">
       <div className="card shadow-lg border-0" style={{ maxWidth: "850px" }}>
@@ -44,7 +55,8 @@ export default function ProductPage() {
           {/* Image Section */}
           <div className="col-md-6">
             <img
-              src={product.image}
+              // ✅ Use helper function here
+              src={getImageUrl(product.image)}
               alt={product.name}
               className="img-fluid rounded-start"
               style={{
@@ -54,6 +66,8 @@ export default function ProductPage() {
                 borderTopLeftRadius: "0.5rem",
                 borderBottomLeftRadius: "0.5rem",
               }}
+              // ✅ Handle broken images
+              onError={(e) => { e.target.src = "https://via.placeholder.com/400"; }}
             />
           </div>
 

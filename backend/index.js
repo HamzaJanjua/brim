@@ -1,27 +1,20 @@
+// backend/index.js
 import express from "express";
-// import dotenv from 'dotenv';
-// dotenv.config();
 import 'dotenv/config'
 import cors from "cors";
 import db from "./config/database.js";
 import productRoute from "./routes/productRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
-
+import path from "path";
+import { fileURLToPath } from 'url';
+import multer from "multer"; // ✅ Import Multer for error checking
 
 const app = express();
+const PORT = process.env.PORT || 3307;
 
-
-const PORT = process.env.PORT;
-// Allowing React frontend (localhost:3000) to access this backend
-// app.use(
-//   cors({
-//     origin: "http://localhost:3000", // your React app's URL
-//     methods: ["GET", "POST"],
-//     credentials: true,
-//   })
-// );
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 app.use(
   cors({
@@ -31,8 +24,9 @@ app.use(
   })
 );
 
+// Serve static files
+app.use('/public/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
-// Middleware to parse JSON request bodies
 app.use(express.json());
 
 // Routes
@@ -40,7 +34,21 @@ app.use("/api/product", productRoute);
 app.use("/api", userRoutes);
 app.use("/api/admin", adminRoutes);
 
-// Optional: test DB connection (for mysql2)
+// ✅ NEW: Global Error Handler (Must be the last middleware)
+app.use((err, req, res, next) => {
+  console.error("🔥 Server Error:", err); // Log error to backend terminal
+
+  if (err instanceof multer.MulterError) {
+    // Handle Multer-specific errors (e.g., File too large)
+    return res.status(400).json({ status: false, message: `Upload Error: ${err.message}` });
+  } else if (err) {
+    // Handle other errors
+    return res.status(500).json({ status: false, message: err.message || "Internal Server Error" });
+  }
+  next();
+});
+
+// DB Connection
 try {
   db.connect?.((err) => {
     if (err) console.error("❌ Database connection failed:", err.message);
@@ -50,7 +58,6 @@ try {
   console.log("ℹ️ Skipping DB connection test...");
 }
 
-// Start server
 app.listen(PORT, () => {
-  console.log("🚀 Server is running on dev environment on port (3307 previous) " + PORT);
+  console.log(`🚀 Server is running on port ${PORT}`);
 });

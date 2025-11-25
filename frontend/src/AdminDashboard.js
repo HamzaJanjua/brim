@@ -9,6 +9,9 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // ✅ Define base URL for your backend (to serve images)
+  const API_URL = "http://localhost:3307";
+
   // Check if admin is logged in
   useEffect(() => {
     const storedAdmin = localStorage.getItem("admin");
@@ -71,6 +74,13 @@ export default function AdminDashboard() {
     navigate(`/admin/edit-product/${productId}`);
   };
 
+  // ✅ Helper to determine correct image source
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return "https://via.placeholder.com/150"; // Fallback placeholder
+    if (imagePath.startsWith("http")) return imagePath; // External URL (old data)
+    return `${API_URL}${imagePath}`; // Local upload (new data)
+  };
+
   return (
     <div className="container my-5">
       {/* Top Section */}
@@ -110,15 +120,13 @@ export default function AdminDashboard() {
             {products.map((product) => (
               <tr key={product.id}>
                 <td>
-                  {product.image ? (
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      style={{ width: "80px", height: "80px", objectFit: "cover" }}
-                    />
-                  ) : (
-                    "No Image"
-                  )}
+                  {/* ✅ Updated Image Logic */}
+                  <img
+                    src={getImageUrl(product.image)}
+                    alt={product.name}
+                    style={{ width: "80px", height: "80px", objectFit: "cover" }}
+                    onError={(e) => { e.target.src = "https://via.placeholder.com/150"; }}
+                  />
                 </td>
                 <td>{product.name}</td>
                 <td>{product.sku || "N/A"}</td>
