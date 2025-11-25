@@ -166,3 +166,13 @@ export const deleteProduct = (req, res) => {
     });
   });
 };
+
+
+export const uploadImage = (req, res) => {
+
+  const {productId} = req.body;
+  const filePath = 'upload/products/' + req.file.filename ;
+
+  const query = "UPDATE products SET iamge= ? WHERE id=?" ;
+
+};

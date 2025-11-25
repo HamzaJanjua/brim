@@ -4,10 +4,12 @@ import {
   addProduct, 
   editProduct, 
   deleteProduct,
-  getProductById // ✅ add this
+  getProductById, // ✅ add this
+  uploadImage
 } from "../controller/productController.js";
 
 import verifyToken from "../middleware/verifytoken.js";
+import { upload } from "../middleware/uploadimage.js";
 
 const router = express.Router();
 
@@ -17,5 +19,6 @@ router.get("/:id", verifyToken, getProductById); // ✅ NEW route to fetch singl
 router.post("/", verifyToken, addProduct);
 router.put("/:id", verifyToken, editProduct);
 router.delete("/:id", verifyToken, deleteProduct);
+router.post('/uploadImage' ,upload.single('productImage'));
 
 export default router;
